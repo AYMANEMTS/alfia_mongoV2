@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use MongoDB\BSON\ObjectId;
 use Illuminate\Support\Facades\Session;
 
 Route::get('/', function () {
