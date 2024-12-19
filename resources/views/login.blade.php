@@ -28,7 +28,7 @@ if(isset($_SESSION['auth']))
         <div class="container py-5 h-100">
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-                    
+
             <div class="login-box">
             <img src="{{ asset('assets/logo-alfia.png') }}" alt="logo">
             @if(session('error'))
@@ -39,12 +39,12 @@ if(isset($_SESSION['auth']))
             <form action="{{ route('postLogin') }}" method="POST" class="form">
                 @csrf
             <div class="user-box">
-                <input type="email" name="email" id="typeEmailX-2" class="input" require>
+                <input type="email" name="email" id="typeEmailX-2" class="input" required>
                 <label class="label" for="">Email</label>
             </div>
             <!-- /.user-box -->
             <div class="user-box">
-                <input type="password" name="password" id="typePasswordX-2" class="input" require>
+                <input type="password" name="password" id="typePasswordX-2" class="input" required>
                 <label class="label" for="">Password</label>
             </div>
             <!-- /.user-box -->
