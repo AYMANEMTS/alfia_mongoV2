@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
 Route::get('/', function () {
+    if (Session::has('auth')) {
+        Session::flash('status', 'Vous êtes déjà connecté');
+        return redirect()->route('dashboard');
+    }
     return view("login");
 })->name("login");
 
