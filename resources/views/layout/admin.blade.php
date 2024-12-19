@@ -44,11 +44,11 @@
       </head>
 <body>
         <!-- Loader starts-->
-        {{-- <div class="loader-wrapper">
-            <div class="theme-loader">    
+         <div class="loader-wrapper">
+            <div class="theme-loader">
               <div class="loader-p"></div>
             </div>
-          </div> --}}
+          </div>
           <!-- Loader ends-->
           <!-- page-wrapper Start-->
           <div class="page-wrapper" id="pageWrapper">
@@ -60,15 +60,15 @@
                   <div class="dark-logo-wrapper"><a href="../index.php"><img class="img-fluid" src="{{ asset('assets/images/logo/dark-logo.png')}} " alt=""></a></div>
                   <div class="toggle-sidebar"><i class="status_toggle middle" data-feather="align-center" id="sidebar-toggle"></i></div>
                 </div>
-                
+
                 <div class="nav-right col pull-right right-menu p-0">
                   <ul class="nav-menus">
                     <li><a class="text-dark" href="#!" onclick="javascript:toggleFullScreen()"><i data-feather="maximize"></i></a></li>
-                    
+
                     <li>
                       <div class="mode"><i class="fa fa-moon-o"></i></div>
                     </li>
-      
+
                     <li class="onhover-dropdown p-0">
                       <button class="btn btn-primary-light" type="button"><a href="{{ route('logout') }}"><i data-feather="log-out"></i>Déconnexion</a></button>
                     </li>
@@ -92,17 +92,17 @@
                     {{-- <?php echo $_SESSION['auth_user']['job']; ?> --}}
                 </p>
                 </div>
-      
+
                 <nav>
                   <div class="main-navbar">
                     <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
-                    <div id="mainnav">           
+                    <div id="mainnav">
                       <ul class="nav-menu custom-scrollbar">
                         <li class="back-btn">
                           <div class="mobile-back text-end"><span>Back</span><i class="fa fa-angle-right ps-2" aria-hidden="true"></i></div>
                         </li>
                         <li class="dropdown"><a class="nav-link menu-title link-nav" href="/admin"><i data-feather="home"></i><span>Tableau de Bord</span></a></li>
-                        
+
                         <li class="sidebar-main-title">
                           <div>
                             <h6> Gérer les données </h6>
@@ -111,7 +111,7 @@
                         <li class="dropdown"><a class="nav-link menu-title link-nav" href="/participant"><i data-feather="user-plus"></i><span>Data Participants</span></a></li>
                         <li class="dropdown"><a class="nav-link menu-title link-nav" href="/formation"><i data-feather="user-check"></i><span>Data Formation</span></a></li>
                         <li class="dropdown"><a class="nav-link menu-title link-nav" href="/accompagnement"><i data-feather="file-text"></i><span>Data Accompagnement</span></a></li>
-                        
+
                         <li class="sidebar-main-title">
                           <div>
                             <h6> Gérer les utilisateurs </h6>
@@ -199,6 +199,6 @@
 </body>
 </html>
 
-              
+
 </body>
 </html>
