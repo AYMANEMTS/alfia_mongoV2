@@ -16,7 +16,7 @@ if(isset($_SESSION['auth']))
     <title></title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ asset('css/style-login.css') }}">
+    <link rel="stylesheet" href="css/style-login.css">
     <!-- CSS only -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
@@ -30,7 +30,8 @@ if(isset($_SESSION['auth']))
                 <div class="col-12 col-md-8 col-lg-6 col-xl-5">
 
             <div class="login-box">
-            <img src="{{ asset('assets/logo-alfia.png') }}" alt="logo">
+            <img src="assets/logo-alfia.png" alt="logo">
+{{--            <img src="{{ asset('assets/logo-alfia.png') }}" alt="logo">--}}
             @if(session('error'))
             <div class="alert alert-danger">
                 {{ session('error') }}
