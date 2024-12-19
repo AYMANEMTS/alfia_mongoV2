@@ -40,10 +40,10 @@ Route::post('/login', function (Request $request) {
 
             if ($user['role'] === "utilistateur") {
                 Session::put('status', "Logged In Successfully");
-                return redirect()->route('dashboard'); 
+                return redirect()->route('dashboard');
             } elseif ($user['role'] === "admin") {
                 Session::put('status', "Logged In Successfully");
-                return redirect()->route('dashboard'); 
+                return redirect()->route('dashboard');
             }
         } else {
             Session::put('status', "Access Denied");
@@ -57,7 +57,7 @@ Route::post('/login', function (Request $request) {
 Route::get('/logout', function () {
     Session::forget('auth');
     Session::forget('auth_user');
-    
+
     Session::put('status', 'Déconnexion réussie');
     return redirect()->route('login');
 })->name('logout')->middleware('auth');
@@ -69,7 +69,7 @@ Route::get('/participant', function () {
 
 Route::get('/formation', function () {
     return view('formation');
-})->middleware('admin');
+})->middleware('auth');
 
 
 Route::get('/accompagnement', function () {
@@ -95,7 +95,7 @@ Route::post('/add-user',function (Request $request) {
     $email = $request->input('email');
     $password = $request->input('password');
     $role = $request->input('role');
-    
+
     try {
         // Create the user data
         $data = [
