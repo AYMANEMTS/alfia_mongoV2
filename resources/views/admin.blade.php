@@ -63,59 +63,89 @@
       </div>
     </div>
     <!-- Container-fluid Ends-->
+    <select id="yearSelect" >
+      @foreach($years as $year)
+        <option value="{{$year}}" @if($loop->first) selected @endif>{{$year}}</option>
+      @endforeach
+    </select>
      <canvas style="margin-left: 15px;max-width: 1190px;max-height: 580px" id="myChart"></canvas>
   </div>
-     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-     <script>
-         // Convert PHP data to JavaScript
-         const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
-         // Ensure the PHP data is properly encoded to JavaScript arrays
-         const participantsData = {!! json_encode($participantsData) !!};
-         const formationsData = {!! json_encode($formationsData) !!};
-         const accompagnementData = {!! json_encode($accompagnementData) !!};
-
-
-         // Render the chart
-         var ctx = document.getElementById('myChart').getContext('2d');
-         var myChart = new Chart(ctx, {
-             type: 'line',
-             data: {
-                 labels: days, // French labels for the week
-                 datasets: [
-                     {
-                         label: 'Participants',
-                         data: participantsData,
-                         borderColor: 'rgba(75, 192, 192, 1)',
-                         borderWidth: 1,
-                         fill: false
-                     },
-                     {
-                         label: 'Formations',
-                         data: formationsData,
-                         borderColor: 'rgba(153, 102, 255, 1)',
-                         borderWidth: 1,
-                         fill: false
-                     },
-                     {
-                         label: 'Accompagnement',
-                         data: accompagnementData,
-                         borderColor: 'rgba(255, 159, 64, 1)',
-                         borderWidth: 1,
-                         fill: false
-                     }
-                 ]
-             },
-             options: {
-                 scales: {
-                     y: {
-                         beginAtZero: true
-                     }
-                 }
-             }
-         });
-     </script>
-
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const participantsData = {!! json_encode($participantsChart) !!};
+    const formationsData = {!! json_encode($formationsChart) !!};
+    const accompagnementData = {!! json_encode($accompagnementChart) !!};
+    const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Aout', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+  
+    // Function to extract the month data for a given year
+    function getDataChartByMonths(data, year) {
+      let result = [];
+      if (data[year]) {
+        Object.keys(data[year].months).forEach((month) => {
+          result.push(data[year].months[month]);
+        });
+      } else {
+        console.log(`Data for year ${year} not found.`);
+      }
+      return result;
+    }
+  
+    // Initial chart setup with default year (use the selected year from the dropdown)
+    const initialYear = document.getElementById('yearSelect').value; // Get the default selected year
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: months,
+        datasets: [
+          {
+            label: 'Formations',
+            data: getDataChartByMonths(formationsData, initialYear), // Default year from the dropdown
+            borderColor: 'rgba(75, 192, 192, 1)',
+            tension: 0.1,
+            fill: false
+          },
+          {
+            label: 'Participants',
+            data: getDataChartByMonths(participantsData, initialYear), // Default year from the dropdown
+            borderColor: 'rgba(153, 102, 255, 1)',
+            tension: 0.1,
+            fill: false
+          },
+          {
+            label: 'Accompagnement',
+            data: getDataChartByMonths(accompagnementData, initialYear), // Default year from the dropdown
+            borderColor: 'rgba(255, 159, 64, 1)',
+            tension: 0.1,
+            fill: false
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  
+    // Event listener for changing year
+    document.getElementById('yearSelect').addEventListener('change', function() {
+      var selectedYear = this.value;
+  
+      // Update the chart with the selected year's data
+      myChart.data.datasets[0].data = getDataChartByMonths(formationsData, selectedYear);
+      myChart.data.datasets[1].data = getDataChartByMonths(participantsData, selectedYear);
+      myChart.data.datasets[2].data = getDataChartByMonths(accompagnementData, selectedYear);
+  
+      // Update the chart
+      myChart.update();
+    });
+  </script>
 
 
 
