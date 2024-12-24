@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -14,8 +15,83 @@ Route::get('/', function () {
 })->name("login");
 
 Route::get('/admin', function () {
-    return view("admin");
+    // Define days in French
+    $days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+
+    $startOfWeek = Carbon::now()->startOfWeek(); // Start of the current week
+    $endOfWeek = Carbon::now()->endOfWeek(); // End of the current week
+
+    // Helper function to map data to French days and fill missing days with 0
+    function mapDataToFrenchDays($data, $days) {
+        $englishToFrench = [
+            'Monday' => 'Lundi',
+            'Tuesday' => 'Mardi',
+            'Wednesday' => 'Mercredi',
+            'Thursday' => 'Jeudi',
+            'Friday' => 'Vendredi',
+            'Saturday' => 'Samedi',
+            'Sunday' => 'Dimanche',
+        ];
+
+        // Initialize an array with all days as 0
+        $mappedData = array_fill_keys($days, 0);
+
+        foreach ($data as $englishDay => $count) {
+            $frenchDay = $englishToFrench[$englishDay] ?? null;
+            if ($frenchDay) {
+                $mappedData[$frenchDay] = $count;
+            }
+        }
+
+        return array_values($mappedData); // Return values in the correct order
+    }
+
+    // Query and group by day for each collection
+    $formations = DB::connection('mongodb')->table('formations')
+        ->whereBetween('createdAt', [$startOfWeek, $endOfWeek])
+        ->get()
+        ->groupBy(function ($date) {
+            return Carbon::parse($date->createdAt)->format('l'); // Group by weekday
+        })
+        ->map(function ($group) {
+            return $group->count();
+        });
+
+    $participants = DB::connection('mongodb')->table('participants')
+        ->whereBetween('createdAt', [$startOfWeek, $endOfWeek])
+        ->get()
+        ->groupBy(function ($date) {
+            return Carbon::parse($date->createdAt)->format('l');
+        })
+        ->map(function ($group) {
+            return $group->count();
+        });
+
+    $accompagnement = DB::connection('mongodb')->table('accompagnment')
+        ->whereBetween('createdAt', [$startOfWeek, $endOfWeek])
+        ->get()
+        ->groupBy(function ($date) {
+            return Carbon::parse($date->createdAt)->format('l');
+        })
+        ->map(function ($group) {
+            return $group->count();
+        });
+
+    // Map the data to French days
+    $formationsData = mapDataToFrenchDays($formations->toArray(), $days);
+    $participantsData = mapDataToFrenchDays($participants->toArray(), $days);
+    $accompagnementData = mapDataToFrenchDays($accompagnement->toArray(), $days);
+
+    // Count total records
+    $formationsCount = DB::connection('mongodb')->table('formations')->count();
+    $participantsCount = DB::connection('mongodb')->table('participants')->count();
+    $accompagnementCount = DB::connection('mongodb')->table('accompagnment')->count();
+
+    // Pass data to the view
+    return view("admin", compact('formationsCount', 'participantsCount', 'accompagnementCount', 'formationsData', 'participantsData', 'accompagnementData'));
 })->name('dashboard')->middleware('auth');
+
+
 
 
 Route::post('/login', function (Request $request) {
@@ -66,17 +142,23 @@ Route::get('/logout', function () {
 })->name('logout')->middleware('auth');
 
 Route::get('/participant', function () {
-    return view('participant');
+    $participantollection = DB::connection('mongodb')->getCollection('participants');
+    $participants = $participantollection->find()->toArray();
+    return view('participant', compact('participants'));
 })->middleware('auth');
 
 
 Route::get('/formation', function () {
-    return view('formation');
+    $formationsollection = DB::connection('mongodb')->getCollection('formations');
+    $formations = $formationsollection->find()->toArray();
+    return view('formation', compact('formations'));
 })->middleware('auth');
 
 
 Route::get('/accompagnement', function () {
-    return view('accompagnement');
+    $accompagnementCollection = DB::connection('mongodb')->getCollection('accompagnment');
+    $accompagnement = $accompagnementCollection->find()->toArray();
+    return view('accompagnement', compact('accompagnement'));
 })->middleware('auth');
 
 Route::get('/users', function () {

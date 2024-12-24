@@ -10,6 +10,7 @@
         "jenssegers/mongodb": "*",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
+        "laraveldaily/laravel-charts": "^0.2.3",
         "mongodb/laravel-mongodb": "^5.1"
     },
     "require-dev": {
