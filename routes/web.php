@@ -18,11 +18,13 @@ Route::get('/', function () {
 
 
 Route::get('/admin', function () {
+    $particpantsGenderData = getParticipantsGenderData('participants')['data'];
+
     // Fetch chart data and years
     $formationsChartData = getChartData('formations');
     $participantsChartData = getChartData('participants');
     $accompagnementChartData = getChartData('accompagnment');
-    
+
     // Extract years from the chart data
     $formationsChart = $formationsChartData['data'];
     $participantsChart = $participantsChartData['data'];
@@ -35,7 +37,7 @@ Route::get('/admin', function () {
 
     // Return the data to the view
     return view("admin", compact('formationsCount', 'participantsCount', 'accompagnementCount', 'formationsChart',
-    'participantsChart','accompagnementChart', 'years'));
+    'participantsChart','accompagnementChart', 'years', 'particpantsGenderData'));
 })->name('dashboard')->middleware('auth');
 
 
@@ -46,7 +48,7 @@ function getChartData($collection) {
         ->aggregate([
             [
                 '$project' => [
-                    'year' => ['$year' => '$createdAt'], 
+                    'year' => ['$year' => '$createdAt'],
                     'month' => ['$month' => '$createdAt'],
                 ],
             ],
@@ -54,15 +56,15 @@ function getChartData($collection) {
                 '$group' => [
                     '_id' => [
                         'year' => '$year',
-                        'month' => '$month', 
+                        'month' => '$month',
                     ],
-                    'count' => ['$sum' => 1], 
+                    'count' => ['$sum' => 1],
                 ],
             ],
             [
                 '$sort' => [
-                    '_id.year' => -1, 
-                    '_id.month' => 1, 
+                    '_id.year' => -1,
+                    '_id.month' => 1,
                 ],
             ],
         ]);
@@ -108,6 +110,107 @@ function getChartData($collection) {
             // If the month is not set, add it with a count of 0
             if (!isset($yearData['months'][$monthName])) {
                 $yearData['months'][$monthName] = 0;
+            }
+        }
+        // Ensure the months are sorted in the correct order
+        ksort($yearData['months']);
+    }
+
+    return ['data' => $results, 'years' => $years];  // Return both the results and the years
+}
+
+
+function getParticipantsGenderData($collection) {
+    // Fetch the data from MongoDB
+    $participants = DB::connection('mongodb')
+        ->getCollection($collection)
+        ->aggregate([
+            [
+                '$project' => [
+                    'year' => ['$year' => '$createdAt'],
+                    'month' => ['$month' => '$createdAt'],
+                    'gender' => 1 // Include gender in the projection
+                ],
+            ],
+            [
+                '$group' => [
+                    '_id' => [
+                        'year' => '$year',
+                        'month' => '$month',
+                        'gender' => '$gender' // Group by gender
+                    ],
+                    'count' => ['$sum' => 1], // Count the documents
+                ],
+            ],
+            [
+                '$sort' => [
+                    '_id.year' => -1,
+                    '_id.month' => 1,
+                ],
+            ],
+        ]);
+
+    // Array of month names for mapping
+    $monthNames = [
+        1 => 'Janvier', '2' => 'Février', '3' => 'Mars', '4' => 'Avril', '5' => 'Mai', '6' => 'Juin',
+        '7' => 'Juillet', '8' => 'Aout', '9' => 'Septembre', '10' => 'Octobre', '11' => 'Novembre', '12' => 'Décembre'
+    ];
+
+    $results = [];
+    $years = [];  // To store the years
+
+    foreach ($participants as $participant) {
+        $year = $participant['_id']['year'];
+        $month = $participant['_id']['month'];
+        $gender = $participant['_id']['gender'];
+        $count = $participant['count'];
+
+        // Store the year in the years array
+        if (!in_array($year, $years)) {
+            $years[] = $year;
+        }
+
+        // If the year does not exist in the results array, create it
+        if (!isset($results[$year])) {
+            $results[$year] = [
+                'year' => $year,
+                'totalCount' => 0,
+                'months' => [],
+            ];
+        }
+
+        // Add the month data for the gender
+        $monthName = $monthNames[$month] ?? "Unknown";
+
+        // Initialize the month if not already set
+        if (!isset($results[$year]['months'][$monthName])) {
+            $results[$year]['months'][$monthName] = [
+                'male' => 0,
+                'female' => 0,
+            ];
+        }
+
+        // Increment the count based on gender
+        if ($gender === 'male') {
+            $results[$year]['months'][$monthName]['male'] += $count;
+        } elseif ($gender === 'female') {
+            $results[$year]['months'][$monthName]['female'] += $count;
+        }
+
+        // Increment the total count for the year
+        $results[$year]['totalCount'] += $count;
+    }
+
+    // Ensure every year has all months (even months with no data should be 0)
+    foreach ($results as &$yearData) {
+        // Loop through all months to check if any month is missing
+        foreach ($monthNames as $monthNum => $monthName) {
+            // If the month is not set, add it with counts of 0 for both genders
+            if (!isset($yearData['months'][$monthName])) {
+                $yearData['months'][$monthName] = [
+                    'male' => 0,
+                    'female' => 0,
+                ];
             }
         }
         // Ensure the months are sorted in the correct order

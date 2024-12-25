@@ -46,6 +46,7 @@
                       <th>Métier</th>
                       <th>Nom de projet</th>
                       <th>idée de projet</th>
+                      <th>Genre</th>
                       <th>Programme</th>
                       <th>Action</th>
 
@@ -67,6 +68,7 @@
                               <td>{{$acc['job'] ?? ''}}</td>
                               <td>{{$acc['nameproject'] ?? ''}}</td>
                               <td>{{$acc['ideaproject'] ?? ''}}</td>
+                              <td>{{$acc['gender'] ?? ''}}</td>
                               <td>{{$acc['alfia'] ?? ''}}</td>
                               <td>
                                   <a id='btn-addformation' class='btn btn-light'>Valider</a>
