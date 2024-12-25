@@ -52,7 +52,7 @@
                               @foreach($accompagnement as $acc)
                                   <tr class='data'>
                                   <div style='display: none;'>" . ({{$acc['_id'] ?? ''}}) . "</div>
-                                      <td>{{$acc['fullname'] ?? ''}}</td>
+                                      <td>{{$acc['fullName'] ?? ''}}</td>
                                       <td>
                                           {{ $acc['tel'] }}
 {{--                                          <a href='tel:" . ($acc['tel'] ?? '') . "'>" . ($acc['tel'] ?? '') . "</a>--}}
